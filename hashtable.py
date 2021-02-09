@@ -1,7 +1,6 @@
-from data_structures import linked_list
 import random
 import string
-
+import linked_list
 
 # [amotz]
 # hashtable partial implementation int and string are supported

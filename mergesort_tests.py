@@ -1,4 +1,4 @@
-from algorithms.mergesort import sort
+from mergesort import sort
 
 # [amotz] the only thing that is not completed i think is that it seems i get some weird assertion error.
 # without the assertion the test function seems to run smoothly without errors

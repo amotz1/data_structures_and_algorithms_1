@@ -1,7 +1,8 @@
-import algorithms.graph_algorithms as graph_algorithms
-from algorithms.graph_algorithms import Graph
-from algorithms.graph_algorithms import Algorithms
+import graph_algorithms as graph_algorithms
+from graph_algorithms import Graph
+from graph_algorithms import Algorithms
 import sys
+from random_graph import create_random_graph
 
 
 def create_brute_force_graph():
@@ -36,7 +37,6 @@ def is_path(edges, source, dest):
     for edge in edges:
         vertex = edge.get_other_vertex(vertex)
     return vertex == dest
-
 
 
 def test_shortest_path_algorithms():
@@ -200,6 +200,35 @@ def test_shortest_path_algorithms():
 
 
 test_shortest_path_algorithms()
+
+
+def test_algorithms_equivalence(vertex_pairs_number):
+    vertices_number = 1000
+    edges_number = 300
+
+    random_graph = create_random_graph(vertices_number, edges_number)
+    graph_vertices = [elem.value for elem in random_graph.label2vertex]
+    maximum_pairs_number = len(graph_vertices) ** 2
+    assert maximum_pairs_number >= vertex_pairs_number >= 0, 'you specified a number out of range, please try ' \
+                                                             'a number between 0 and %d' % maximum_pairs_number
+
+    pair_counter = 0
+    for vertex1 in graph_vertices:
+        for vertex2 in graph_vertices:
+            pair_counter += 1
+            (shortest_path_length, shortest_path) = Algorithms.shortest_path(vertex1, vertex2)
+            (shortest_path_length_bf, shortest_path_bf) = Algorithms.shortest_path_bf(vertex1, vertex2)
+            assert shortest_path_length == shortest_path_length_bf
+
+        if pair_counter == vertex_pairs_number:
+            break
+
+
+test_algorithms_equivalence(90000)
+
+
+
+
 
 # TODO optimizing path_vartices to be a hashtable  for better performance in find_path_vertices function.
 # TODO maybe trying to avoid the find_path_vertices and using lambda instead for lazy evaluation

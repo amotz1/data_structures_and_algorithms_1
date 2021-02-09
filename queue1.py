@@ -1,4 +1,4 @@
-from data_structures import linked_list
+import linked_list
 
 
 class Queue:

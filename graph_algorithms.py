@@ -1,8 +1,7 @@
-from data_structures import hashtable
-from data_structures import stack
-from data_structures import queue1
 import sys
-
+import hashtable
+import queue1
+import stack
 
 #  implementation of a dfs, recursive dfs and bfs on an undirected graph
 #  implementation of a shortest path algorithm
@@ -44,16 +43,16 @@ class Graph:
         return vertex
 
     def dump_graph(self):
-        edges_list = []
-        graph_visualization = {}
+        graph_representation = {}
 
-        for label in self.label2vertex:
-            for edge in self.label2vertex.get(label).edges:
+        for KeyValuePair in self.label2vertex:
+            edges_list = []
+            for edge in KeyValuePair.value.edges:
                 edges_list.append(edge)
 
-            graph_visualization[self.label2vertex.get(label)] = edges_list
+            graph_representation[KeyValuePair.value] = edges_list
 
-        return graph_visualization
+        return graph_representation
 
 
 class Vertex:

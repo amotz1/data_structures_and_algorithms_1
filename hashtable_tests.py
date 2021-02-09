@@ -1,9 +1,9 @@
-from data_structures import linked_list
-from data_structures import hashtable
-from data_structures.hashtable import generate_random_number
-from data_structures.hashtable import generate_random_string
-from data_structures.hashtable import compute_hash_code
-from data_structures.hashtable import KeyValuePair
+import hashtable
+from hashtable import compute_hash_code
+from hashtable import KeyValuePair
+from hashtable import generate_random_number
+from hashtable import generate_random_string
+import linked_list
 
 
 def test_Hashtable():

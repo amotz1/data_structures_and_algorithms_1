@@ -1,6 +1,6 @@
-import algorithms.mergesort as mergesort
-import algorithms.graph_algorithms as graph_algorithms
-from algorithms.graph_algorithms import Algorithms
+import mergesort as mergesort
+import graph_algorithms as graph_algorithms
+from graph_algorithms import Algorithms
 
 
 def create_test_Graph():
