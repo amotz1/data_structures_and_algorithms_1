@@ -2,7 +2,9 @@ import graph_algorithms as graph_algorithms
 from graph_algorithms import Graph
 from graph_algorithms import Algorithms
 import sys
+
 from random_graph import create_random_graph
+import time
 
 
 def create_brute_force_graph():
@@ -25,7 +27,6 @@ def create_brute_force_graph():
 def test_correct_path(edges, correct_edges_attributes):
     assert len(edges) == len(correct_edges_attributes)
     for edge, attributes in zip(edges, correct_edges_attributes):
-
         # comparing each edge vertex attribute to either one of two vertices because edges are bi-directional
         assert edge.vertex_1 == attributes[0] and edge.vertex_2 == attributes[1] \
                or edge.vertex_2 == attributes[0] and edge.vertex_1 == attributes[1]
@@ -190,7 +191,6 @@ def test_shortest_path_algorithms():
     haifa_rishon1 = israel_cities.create_edge(haifa, rishon, 10)
     haifa_rishon2 = israel_cities.create_edge(haifa, rishon, 6)
     rishon_eilat = israel_cities.create_edge(rishon, eilat, 10)
-
     assert haifa.get_edges() == [haifa_rishon1, haifa_rishon2]
     assert rishon.get_edges() == [haifa_rishon1, haifa_rishon2, rishon_eilat]
     assert eilat.get_edges() == [rishon_eilat]
@@ -202,10 +202,7 @@ def test_shortest_path_algorithms():
 test_shortest_path_algorithms()
 
 
-def test_algorithms_equivalence(vertex_pairs_number):
-    vertices_number = 1000
-    edges_number = 300
-
+def test_algorithms_equivalence(vertex_pairs_number, vertices_number, edges_number):
     random_graph = create_random_graph(vertices_number, edges_number)
     graph_vertices = [elem.value for elem in random_graph.label2vertex]
     maximum_pairs_number = len(graph_vertices) ** 2
@@ -218,20 +215,49 @@ def test_algorithms_equivalence(vertex_pairs_number):
             pair_counter += 1
             (shortest_path_length, shortest_path) = Algorithms.shortest_path(vertex1, vertex2)
             (shortest_path_length_bf, shortest_path_bf) = Algorithms.shortest_path_bf(vertex1, vertex2)
+
             assert shortest_path_length == shortest_path_length_bf
 
         if pair_counter == vertex_pairs_number:
             break
 
 
-test_algorithms_equivalence(90000)
+def calc_algorithms_duration_ratio(vertex_pairs_number, vertices_number, edges_number):
+    random_graph = create_random_graph(vertices_number, edges_number)
+    graph_vertices = [elem.value for elem in random_graph.label2vertex]
+    maximum_pairs_number = len(graph_vertices) ** 2
+    assert maximum_pairs_number >= vertex_pairs_number >= 0, 'you specified a number out of range, please try ' \
+                                                             'a number between 0 and %d' % maximum_pairs_number
+
+    pair_counter = 0
+    shortest_path_acc_time = 0
+    shortest_path_bf_acc_time = 0
+    for vertex1 in graph_vertices:
+        for vertex2 in graph_vertices:
+            pair_counter += 1
+
+            shortest_path_start_time = time.process_time()
+            (dummy, dummy) = Algorithms.shortest_path(vertex1, vertex2)
+            shortest_path_duration = time.process_time() - shortest_path_start_time
+
+            shortest_path_bf_start_time = time.process_time()
+            (dummy, dummy) = Algorithms.shortest_path_bf(vertex1, vertex2)
+            shortest_path_bf_duration = time.process_time() - shortest_path_bf_start_time
+
+            shortest_path_acc_time += shortest_path_duration
+            shortest_path_bf_acc_time += shortest_path_bf_duration
+
+        if pair_counter == vertex_pairs_number:
+            break
+
+    return shortest_path_bf_acc_time / shortest_path_acc_time
 
 
-
-
+test_algorithms_equivalence(90000, 1000, 500)
+print(calc_algorithms_duration_ratio(90000, 1000, 300))
 
 # TODO optimizing path_vartices to be a hashtable  for better performance in find_path_vertices function.
 # TODO maybe trying to avoid the find_path_vertices and using lambda instead for lazy evaluation
-# TODO making the recursion call return a list of paths instead of an output parameter
+# TODO making the recursion call r
+#  eturn a list of paths instead of an output parameter
 # TODO making random_graph and comparing shortest_path_bf with shortest_path
-
