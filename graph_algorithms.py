@@ -160,7 +160,7 @@ class Algorithms:
         return vertices_list
 
     @staticmethod
-    def shortest_path(source, dest):
+    def dykstra(source, dest):
 
         # Path length refers to the shortest path length that the algorithm has found so far
         # from the source to a visited vertex

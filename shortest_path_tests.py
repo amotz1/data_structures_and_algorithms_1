@@ -7,7 +7,7 @@ from random_graph import create_random_graph
 import time
 
 
-def create_brute_force_graph():
+def create_graph():
     israel_cities = graph_algorithms.Graph()
 
     haifa = israel_cities.create_vertex('haifa')
@@ -41,7 +41,7 @@ def is_path(edges, source, dest):
 
 
 def test_shortest_path_algorithms():
-    israel_cities = create_brute_force_graph()
+    israel_cities = create_graph()
     haifa = israel_cities.get_vertex('haifa')
     rishon = israel_cities.get_vertex('rishon')
     naharia = israel_cities.get_vertex('naharia')
@@ -103,7 +103,7 @@ def test_shortest_path_algorithms():
     israel_cities.create_edge(naharia, beer_sheva, 20)
     israel_cities.create_edge(beer_sheva, eilat, 90)
 
-    (shortest_path_length, shortest_path) = Algorithms.shortest_path(haifa, haifa)
+    (shortest_path_length, shortest_path) = Algorithms.dykstra(haifa, haifa)
     (shortest_path_length_bf, shortest_path_bf) = Algorithms.shortest_path_bf(haifa, haifa)
 
     assert shortest_path_length == shortest_path_length_bf
@@ -114,7 +114,7 @@ def test_shortest_path_algorithms():
     correct_edges_attributes = []
     test_correct_path(shortest_path, correct_edges_attributes)
 
-    (shortest_path_length, shortest_path) = Algorithms.shortest_path(haifa, rishon)
+    (shortest_path_length, shortest_path) = Algorithms.dykstra(haifa, rishon)
     (shortest_path_length_bf, shortest_path_bf) = Algorithms.shortest_path_bf(haifa, rishon)
 
     assert shortest_path_length == shortest_path_length_bf
@@ -125,7 +125,7 @@ def test_shortest_path_algorithms():
     correct_edges_attributes = [(haifa, rishon, 40)]
     test_correct_path(shortest_path, correct_edges_attributes)
 
-    (shortest_path_length, shortest_path) = Algorithms.shortest_path(rishon, haifa)
+    (shortest_path_length, shortest_path) = Algorithms.dykstra(rishon, haifa)
     (shortest_path_length_bf, shortest_path_bf) = Algorithms.shortest_path_bf(rishon, haifa)
 
     assert shortest_path_length == shortest_path_length_bf
@@ -136,7 +136,7 @@ def test_shortest_path_algorithms():
     correct_edges_attributes = [(rishon, haifa, 40)]
     test_correct_path(shortest_path, correct_edges_attributes)
 
-    (shortest_path_length, shortest_path) = Algorithms.shortest_path(haifa, eilat)
+    (shortest_path_length, shortest_path) = Algorithms.dykstra(haifa, eilat)
     (shortest_path_length_bf, shortest_path_bf) = Algorithms.shortest_path_bf(haifa, eilat)
 
     assert shortest_path_length == shortest_path_length_bf
@@ -165,7 +165,7 @@ def test_shortest_path_algorithms():
     israel_cities.create_edge(petach_tikva, eilat, 1)
     israel_cities.create_edge(rishon, eilat, 30)
 
-    (shortest_path_length, shortest_path) = Algorithms.shortest_path(haifa, eilat)
+    (shortest_path_length, shortest_path) = Algorithms.dykstra(haifa, eilat)
     (shortest_path_length_bf, shortest_path_bf) = Algorithms.shortest_path_bf(haifa, eilat)
 
     assert shortest_path_length == shortest_path_length_bf
@@ -180,7 +180,7 @@ def test_shortest_path_algorithms():
     unreachable_test_graph = Graph()
     x = unreachable_test_graph.create_vertex('dummy')
     y = unreachable_test_graph.create_vertex('dummy')
-    assert Algorithms.shortest_path(x, y) == (sys.maxsize, None)
+    assert Algorithms.dykstra(x, y) == (sys.maxsize, None)
     assert Algorithms.shortest_path_bf(x, y) == (sys.maxsize, None)
 
     # checking a test case of a graph with 2 edges between 2 vertices
@@ -195,67 +195,65 @@ def test_shortest_path_algorithms():
     assert rishon.get_edges() == [haifa_rishon1, haifa_rishon2, rishon_eilat]
     assert eilat.get_edges() == [rishon_eilat]
 
-    assert Algorithms.shortest_path(haifa, eilat) == (16, [haifa_rishon2, rishon_eilat])
+    assert Algorithms.dykstra(haifa, eilat) == (16, [haifa_rishon2, rishon_eilat])
     assert Algorithms.shortest_path_bf(haifa, eilat) == (16, [haifa_rishon2, rishon_eilat])
 
 
 test_shortest_path_algorithms()
 
 
-def test_algorithms_equivalence(vertex_pairs_number, vertices_number, edges_number):
-    random_graph = create_random_graph(vertices_number, edges_number)
-    graph_vertices = [elem.value for elem in random_graph.label2vertex]
-    maximum_pairs_number = len(graph_vertices) ** 2
-    assert maximum_pairs_number >= vertex_pairs_number >= 0, 'you specified a number out of range, please try ' \
-                                                             'a number between 0 and %d' % maximum_pairs_number
+def test_algorithms_equivalence(num_vertex_pairs, num_vertices, num_edges):
+    random_graph = create_random_graph(num_vertices, num_edges)
+    vertices = [elem.value for elem in random_graph.label2vertex]
+    max_num_pairs = len(vertices) ** 2
+    assert max_num_pairs >= num_vertex_pairs >= 0, 'you specified a number out of range, please try ' \
+                                                             'a number between 0 and %d' % max_num_pairs
 
     pair_counter = 0
-    for vertex1 in graph_vertices:
-        for vertex2 in graph_vertices:
+    for vertex1 in vertices:
+        for vertex2 in vertices:
             pair_counter += 1
-            (shortest_path_length, shortest_path) = Algorithms.shortest_path(vertex1, vertex2)
+            (shortest_path_length, shortest_path) = Algorithms.dykstra(vertex1, vertex2)
             (shortest_path_length_bf, shortest_path_bf) = Algorithms.shortest_path_bf(vertex1, vertex2)
 
             assert shortest_path_length == shortest_path_length_bf
 
-        if pair_counter == vertex_pairs_number:
+        if pair_counter == num_vertex_pairs:
             break
 
 
-def calc_algorithms_duration_ratio(vertex_pairs_number, vertices_number, edges_number):
-    random_graph = create_random_graph(vertices_number, edges_number)
-    graph_vertices = [elem.value for elem in random_graph.label2vertex]
-    maximum_pairs_number = len(graph_vertices) ** 2
-    assert maximum_pairs_number >= vertex_pairs_number >= 0, 'you specified a number out of range, please try ' \
-                                                             'a number between 0 and %d' % maximum_pairs_number
+def calc_algorithms_exec_times(num_vertex_pairs, random_graph):
+    vertices = [elem.value for elem in random_graph.label2vertex]
+    max_num_pairs = len(vertices) ** 2
+    assert max_num_pairs >= num_vertex_pairs >= 0, 'you specified a number out of range, please try ' \
+                                                             'a number between 0 and %d' % max_num_pairs
 
     pair_counter = 0
-    shortest_path_acc_time = 0
-    shortest_path_bf_acc_time = 0
-    for vertex1 in graph_vertices:
-        for vertex2 in graph_vertices:
+    shortest_path_total_time = 0
+    shortest_path_bf_total_time = 0
+    for vertex1 in vertices:
+        for vertex2 in vertices:
             pair_counter += 1
 
+            if pair_counter >= num_vertex_pairs:
+                break
+
             shortest_path_start_time = time.process_time()
-            (dummy, dummy) = Algorithms.shortest_path(vertex1, vertex2)
-            shortest_path_duration = time.process_time() - shortest_path_start_time
+            Algorithms.dykstra(vertex1, vertex2)
+            shortest_path_exec_time = time.process_time() - shortest_path_start_time
+            shortest_path_total_time += shortest_path_exec_time
 
             shortest_path_bf_start_time = time.process_time()
-            (dummy, dummy) = Algorithms.shortest_path_bf(vertex1, vertex2)
-            shortest_path_bf_duration = time.process_time() - shortest_path_bf_start_time
+            Algorithms.shortest_path_bf(vertex1, vertex2)
+            shortest_path_bf_exec_time = time.process_time() - shortest_path_bf_start_time
+            shortest_path_bf_total_time += shortest_path_bf_exec_time
 
-            shortest_path_acc_time += shortest_path_duration
-            shortest_path_bf_acc_time += shortest_path_bf_duration
-
-        if pair_counter == vertex_pairs_number:
-            break
-
-    return shortest_path_bf_acc_time / shortest_path_acc_time
+    return shortest_path_bf_total_time, shortest_path_total_time
 
 
 test_algorithms_equivalence(90000, 1000, 500)
-print(calc_algorithms_duration_ratio(90000, 1000, 300))
 
+# TODO  a function that calculates the exec times on a growing graphs
 # TODO optimizing path_vartices to be a hashtable  for better performance in find_path_vertices function.
 # TODO maybe trying to avoid the find_path_vertices and using lambda instead for lazy evaluation
 # TODO making the recursion call r
