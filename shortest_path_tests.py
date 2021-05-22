@@ -251,6 +251,22 @@ def calc_algorithms_exec_times(num_vertex_pairs, random_graph):
     return shortest_path_bf_total_time, shortest_path_total_time
 
 
+def print_perf_data():
+    num_vertices = 1000
+    num_edges = 10
+    num_vertex_pairs = 90000
+    num_tests = 26
+
+    for i in range(num_tests):
+        random_graph = create_random_graph(num_vertices, num_edges)
+        (dykstra, brute_force) = calc_algorithms_exec_times(num_vertex_pairs, random_graph)
+        print(f'{dykstra} {brute_force}')
+
+        num_edges += 20
+
+
+print_perf_data()
+
 test_algorithms_equivalence(90000, 1000, 500)
 
 # TODO  a function that calculates the exec times on a growing graphs
