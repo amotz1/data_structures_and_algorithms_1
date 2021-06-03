@@ -2,9 +2,10 @@ import graph_algorithms as graph_algorithms
 from graph_algorithms import Graph
 from graph_algorithms import Algorithms
 import sys
-
+import datetime
 from random_graph import create_random_graph
 import time
+import os
 
 
 def create_graph():
@@ -226,7 +227,7 @@ def calc_algorithms_exec_times(num_vertex_pairs, random_graph):
     vertices = [elem.value for elem in random_graph.label2vertex]
     max_num_pairs = len(vertices) ** 2
     assert max_num_pairs >= num_vertex_pairs >= 0, 'you specified a number out of range, please try ' \
-                                                             'a number between 0 and %d' % max_num_pairs
+                                                   'a number between 0 and %d' % max_num_pairs
 
     pair_counter = 0
     shortest_path_total_time = 0
@@ -251,25 +252,41 @@ def calc_algorithms_exec_times(num_vertex_pairs, random_graph):
     return shortest_path_bf_total_time, shortest_path_total_time
 
 
-def print_perf_data():
-    num_vertices = 1000
-    num_edges = 10
-    num_vertex_pairs = 90000
-    num_tests = 26
+def create_perf_exp(num_vertices, num_edges, num_vertex_pairs, edge_increment, num_tests):
+    print('starting experiment... \n')
+    time.sleep(2)
 
-    for i in range(num_tests):
-        random_graph = create_random_graph(num_vertices, num_edges)
-        (dykstra, brute_force) = calc_algorithms_exec_times(num_vertex_pairs, random_graph)
-        print(f'{dykstra} {brute_force}')
+    date_time = datetime.datetime.now()
+    d = (str(date_time).split(' ')[0])
+    t = (str(date_time).split(' ')[1]).replace(":", "-")
+    with open(f'performance experiment for dykstra and brute_force ' + str(d) + ' ' + str(t)
+              + '.txt', 'a') as text_file:
 
-        num_edges += 20
+        text_file.write(f'uniform random graph with {num_edges} edges and {num_vertices} '
+                        f'vertices. doing {num_tests} tests with {edge_increment} edge increment. searching '
+                        f'{num_vertex_pairs} vertex pairs.' + '\n' + '\n')
+
+        for test in range(num_tests):
+            uniform_random_graph = create_random_graph(num_vertices, num_edges)
+            (dykstra, brute_force) = calc_algorithms_exec_times(num_vertex_pairs, uniform_random_graph)
+            text_file.write(str(dykstra) + ' ' + str(brute_force) + '\n')
+            print(f'd {dykstra} b {brute_force} num tests {test}')
+            num_edges += edge_increment
+
+    print('end of experiment \n')
+    time.sleep(2)
 
 
-print_perf_data()
+create_perf_exp(10, 10, 90, 1, 20)
+create_perf_exp(15, 15, 203, 1, 20)
+create_perf_exp(20, 20, 360, 1, 20)
+
+create_perf_exp(100, 20, 9000, 1, 20)
+create_perf_exp(120, 30, 12960, 1, 20)
+create_perf_exp(160, 40, 23040, 1, 20)
 
 test_algorithms_equivalence(90000, 1000, 500)
 
-# TODO  a function that calculates the exec times on a growing graphs
 # TODO optimizing path_vartices to be a hashtable  for better performance in find_path_vertices function.
 # TODO maybe trying to avoid the find_path_vertices and using lambda instead for lazy evaluation
 # TODO making the recursion call r
